@@ -28,7 +28,7 @@ def capture_video_audio():
     ]
 
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando)
+    subprocess.run(comando)
 
 def transcode_video():
     input_file = os.path.join(BASE_DIR, "captura_video.mp4")
@@ -36,38 +36,38 @@ def transcode_video():
     
     comando = [FFMPEG_PATH, "-i", input_file, "-c:v", "libx264", output_file]
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando)
+    subprocess.run(comando)
 
 def multiplex_dash():
     input_file = os.path.join(BASE_DIR, "transcodificado_h264.mp4")
     os.makedirs(DASH_OUTPUT_DIR, exist_ok=True)
     
     comando = [
-        FFMPEG_PATH, "-i", input_file, "-map", "0", 
+        FFMPEG_PATH, "-i", "\"" + input_file + "\"", "-map", "0", 
         "-b:v:0", "3000k", "-s:v:0", "1920x1080",
         "-b:v:1", "1500k", "-s:v:1", "1280x720", 
         "-b:v:2", "800k", "-s:v:2", "640x480",
         "-b:a:0", "128k", "-ac:a:0", "2", 
         "-b:a:1", "64k", "-ac:a:1", "1",
-        "-f", "dash", os.path.join(DASH_OUTPUT_DIR, "manifest.mpd")
+        "-f", "dash", "\"" + os.path.join(DASH_OUTPUT_DIR, "manifest.mpd") + "\""
     ]
     
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando)
+    subprocess.run(comando)
 
 def multiplex_mpeg_ts():
     input_file = os.path.join(BASE_DIR, "transcodificado_h264.mp4")
     output_file = os.path.join(BASE_DIR, "multiplexado.ts")
     
-    comando = [FFMPEG_PATH, "-i", input_file, "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", "-f", "mpegts", output_file]
+    comando = [FFMPEG_PATH, "-i", "\"" + input_file + "\"", "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", "-f", "mpegts", "\"" + output_file + "\""]
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando)
+    subprocess.run(comando)
 
 def stream_dash():
     dash_manifest = os.path.join(DASH_OUTPUT_DIR, "manifest.mpd")
     comando = f"{FFMPEG_PATH} -f dash -i \"{dash_manifest}\" -c copy -f dash -listen 1 \"{dash_manifest}\""
     print(f"Executando comando: {comando}")
-    # subprocess.run(comando, shell=True)
+    subprocess.run(comando, shell=True)
 
 def stream_rtp():
     rtp_output_video = "rtp://localhost:5004"
@@ -79,19 +79,19 @@ def stream_rtp():
         "-sdp_file", "stream.sdp"
     ]
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando)
+    subprocess.run(comando)
 
 
 def teste_dash():
     dash_manifest = os.path.join("dash_output\\", "manifest.mpd")
     comando = [FFPLAY_PATH, dash_manifest]
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando, shell=False)
+    subprocess.run(comando, shell=True)
 
 def teste_rtp():    
     comando = [FFPLAY_PATH, " -protocol_whitelist \"file,udp,rtp\" stream.sdp"]
     print(f"Executando comando: {' '.join(comando)}")
-    # subprocess.run(comando, shell=True)
+    subprocess.run(comando, shell=True)
 
 def main():
     while True:
